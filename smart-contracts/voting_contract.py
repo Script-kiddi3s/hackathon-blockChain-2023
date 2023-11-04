@@ -1,9 +1,16 @@
 from pyteal import *
 
 def voting_contract():
+    program = Gtxn[1].type_enum() == TxnType.Payment    
+    SENDER = txn.sender()`
+    RECEIVER = txn.Receiver()
+    can_vote_key = Bytes('canVote')
+    votes_key = Bytes('votes')
     on_initialization = Seq([
-        App.localPut(Int(0), Int(0)),  # Initialize the vote count (storage 0) to 0
-        Return(Int(1))  # Return success
+        App.localPut(SENDER, can_vote_key, Int(0)),
+        acc_votes := App.localGet(RECEIVER, votes_key),
+        App.localPut(RECEIVER, votes_key, acc_votes + Int(1)),
+        Return(Int(0))
     ])
 
     on_vote = Seq([
